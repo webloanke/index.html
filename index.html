@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Haraka Loans</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--green-mid:#9FE1CB;--amber:#BA7517;--amber-light:#FAEEDA;--danger:#E24B4A;--danger-light:#FCEBEB;--text:#2C2C2A;--text2:#5F5E5A;--text3:#888780;--border:#D3D1C7;--bg:#F1EFE8;--white:#fff;--card:16px;--radius:10px;--max:480px}
+html,body{width:100%;min-height:100vh;background:#d4d0c8}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);display:flex;justify-content:center}
+#app{width:100%;max-width:var(--max);min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;min-height:100vh;animation:fadeIn .25s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.topbar{background:var(--green-dark);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.topbar-logo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.5px}
+.topbar-back{cursor:pointer;font-size:20px;opacity:.8;line-height:1}
+.topbar-subtitle{font-size:11px;opacity:.7;margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.hero{background:var(--green-dark);padding:32px 20px 28px;color:#fff}
+.hero h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1.2;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.85;line-height:1.6}
+.body{padding:16px;flex:1}
+.card{background:var(--white);border-radius:var(--card);padding:18px;border:.5px solid var(--border);margin-bottom:14px}
+label{font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
+input[type=text],input[type=tel],input[type=password]{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:inherit;color:var(--text);background:var(--white);outline:none;transition:border .2s;-webkit-appearance:none}
+input:focus{border-color:var(--green)}
+.field{margin-bottom:14px}
+.btn{width:100%;padding:13px;border-radius:var(--radius);border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;-webkit-appearance:none}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green-dark)}
+.btn-outline{background:transparent;color:var(--green);border:1.5px solid var(--green);margin-top:10px}
+.btn-icon{background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-icon:hover{background:rgba(255,255,255,.28)}
+.error{background:var(--danger-light);color:var(--danger);font-size:13px;padding:10px 13px;border-radius:var(--radius);margin-bottom:13px;display:none}
+.hint{font-size:11px;color:var(--text3);margin-top:4px}
+.section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)}
+.loan-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.loan-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--card);padding:14px 10px;cursor:pointer;text-align:center;transition:all .2s}
+.loan-card:hover{border-color:var(--green);background:var(--green-light)}
+.loan-card.selected{border-color:var(--green);background:var(--green-light);box-shadow:0 0 0 3px rgba(29,158,117,.15)}
+.loan-card .amount{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--green-dark)}
+.loan-card .label{font-size:11px;color:var(--text3);margin-top:3px}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid var(--border)}
+.summary-row:last-child{border-bottom:none}
+.summary-row .k{font-size:13px;color:var(--text2)}
+.summary-row .v{font-size:13px;font-weight:600;color:var(--text)}
+.summary-row .v.green{color:var(--green-dark)}
+.summary-row .v.amber{color:var(--amber)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.badge-green{background:var(--green-light);color:var(--green-dark)}
+.success-icon{width:60px;height:60px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;color:var(--green-dark)}
+.success-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;text-align:center;color:var(--green-dark);margin-bottom:7px}
+.success-sub{font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:18px}
+.ref-box{background:var(--green-light);border-radius:var(--radius);padding:12px 16px;text-align:center;margin-bottom:14px}
+.ref-label{font-size:11px;color:var(--green-dark);font-weight:600;letter-spacing:.5px;margin-bottom:3px}
+.ref-num{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--green-dark)}
+.nav-tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:48px;z-index:5}
+.nav-tab{flex:1;padding:11px 4px;font-size:12px;font-weight:500;color:var(--text3);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.nav-tab.active{color:var(--green-dark);border-bottom-color:var(--green)}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.stat-card{background:var(--bg);border-radius:var(--radius);padding:13px;text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--green-dark)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pill-success{background:var(--green-light);color:var(--green-dark)}
+.divider{height:.5px;background:var(--border);margin:14px 0}
+.empty-state{text-align:center;padding:36px 20px;color:var(--text3);font-size:14px}
+.tc-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.5}
+.tc-check input[type=checkbox]{width:18px;height:18px;min-width:18px;margin-top:1px;accent-color:var(--green);cursor:pointer}
+.tc-link{color:var(--green);text-decoration:underline;cursor:pointer;font-weight:500}
+/* Notice modal */
+.notice-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.notice-modal.open{display:flex}
+.notice-sheet{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:var(--max);padding:24px 20px 32px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.notice-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.notice-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--green-dark);margin-bottom:14px}
+.notice-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.notice-dot{width:32px;height:32px;min-width:32px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green-dark);font-weight:700}
+.notice-text{font-size:13px;color:var(--text2);line-height:1.6;padding-top:5px}
+.btn-close-notice{width:100%;margin-top:6px;padding:13px;border-radius:var(--radius);border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;background:var(--green);color:#fff}
+/* Contact */
+.contact-icon-box{width:48px;height:48px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.contact-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:.5px solid var(--border)}
+.contact-row:last-child{border-bottom:none}
+.contact-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.contact-val{font-size:14px;font-weight:500;color:var(--text)}
+/* T&C */
+.tc-page{padding:20px;flex:1}
+.tc-page h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--green-dark);margin:18px 0 8px}
+.tc-page h2:first-child{margin-top:0}
+.tc-page p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px}
+.tc-page ul{font-size:13px;color:var(--text2);line-height:1.7;padding-left:18px;margin-bottom:8px}
+/* Payment instructions */
+.pay-instr-box{background:var(--green-light);border-radius:var(--card);padding:18px;margin-bottom:14px;border:1px solid var(--green-mid)}
+.pay-instr-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--green-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pay-step{display:flex;gap:12px;margin-bottom:11px;align-items:flex-start}
+.pay-step-num{width:24px;height:24px;min-width:24px;background:var(--green-dark);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+.pay-step-text{font-size:13px;color:var(--text2);line-height:1.6}
+.pay-step-text strong{color:var(--text)}
+.pay-link{color:var(--green-dark);font-weight:700;text-decoration:none;word-break:break-all}
+.pay-warning{background:var(--amber-light);border:1px solid #e8c97a;border-radius:var(--radius);padding:10px 13px;font-size:12px;color:var(--amber);line-height:1.6;margin-bottom:14px;font-weight:500}
+.pay-fee-highlight{background:var(--white);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;border:1.5px solid var(--green-mid)}
+.pay-fee-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.pay-done-btn{background:var(--green);color:#fff;width:100%;padding:13px;border-radius:var(--radius);border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer}
+/* Referral */
+.ref-prog-card{background:var(--white);border-radius:var(--card);padding:16px;border:.5px solid var(--border);margin-bottom:14px}
+.ref-prog-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--green-dark);margin-bottom:4px}
+.ref-prog-sub{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.ref-bar-wrap{background:var(--bg);border-radius:20px;height:12px;overflow:hidden;margin-bottom:6px;position:relative}
+.ref-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-mid));border-radius:20px;transition:width .4s ease}
+.ref-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:10px}
+.ref-dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ref-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);transition:all .3s}
+.ref-dot.done{background:var(--green);border-color:var(--green);color:#fff;font-size:13px}
+.ref-share-btn{background:var(--green-dark);color:#fff;border:none;border-radius:var(--radius);padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;margin-bottom:8px}
+.ref-complete-badge{background:var(--green-light);border:1.5px solid var(--green-mid);border-radius:var(--radius);padding:12px;text-align:center;display:none}
+.ref-complete-badge.show{display:block}
+.ref-complete-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--green-dark);margin-bottom:3px}
+.ref-complete-sub{font-size:12px;color:var(--text2)}
+/* Share modal */
+.share-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.share-modal.open{display:flex}
+.share-sheet{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:var(--max);padding:24px 20px 36px;animation:slideUp .25s ease}
+.share-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px}
+.share-sub{font-size:12px;color:var(--text3);margin-bottom:18px}
+.share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.share-item{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;padding:10px 4px;border-radius:12px;transition:background .2s}
+.share-item:hover{background:var(--bg)}
+.share-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.share-item span{font-size:11px;color:var(--text2);font-weight:500;text-align:center}
+.share-cancel{width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border);background:transparent;font-family:inherit;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer}
+/* Free loan banner */
+.free-loan-banner{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:var(--card);padding:14px 16px;margin-bottom:14px;color:#fff;display:none}
+.free-loan-banner.show{display:block}
+.free-loan-banner-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:3px}
+.free-loan-banner-sub{font-size:12px;opacity:.85}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- Notice modal -->
+<div id="notice-modal" class="notice-modal" onclick="closeNoticeIfBg(event)">
+  <div class="notice-sheet">
+    <div class="notice-handle"></div>
+    <div class="notice-title">Important Loan Notice</div>
+    <div class="notice-item">
+      <div class="notice-dot">1</div>
+      <div class="notice-text"><strong>Repayment:</strong> All loans are paid back within <strong>6 months</strong> at a <strong>6% interest rate</strong> per month.</div>
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot">2</div>
+      <div class="notice-text"><strong>Disbursement:</strong> All loan requests are processed and given within <strong>24 hours</strong>, but normally within an hour. Any delay — please contact us via the Contact page.</div>
+    </div>
+    <button class="btn-close-notice" onclick="closeNotice()">Got it</button>
+  </div>
+</div>
+
+<!-- Share modal -->
+<div id="share-modal" class="share-modal" onclick="closeShareIfBg(event)">
+  <div class="share-sheet">
+    <div class="notice-handle"></div>
+    <div class="share-title">Share with a friend</div>
+    <div class="share-sub">Share Haraka Loans with one friend at a time to build your referral</div>
+    <div class="share-grid">
+      <div class="share-item" onclick="doShare('whatsapp')">
+        <div class="share-icon" style="background:#E8F5E9">📱</div>
+        <span>WhatsApp</span>
+      </div>
+      <div class="share-item" onclick="doShare('facebook')">
+        <div class="share-icon" style="background:#E3F0FF">📘</div>
+        <span>Facebook</span>
+      </div>
+      <div class="share-item" onclick="doShare('sms')">
+        <div class="share-icon" style="background:#FFF3E0">💬</div>
+        <span>SMS</span>
+      </div>
+      <div class="share-item" onclick="doShare('twitter')">
+        <div class="share-icon" style="background:#E8F5FD">🐦</div>
+        <span>Twitter/X</span>
+      </div>
+      <div class="share-item" onclick="doShare('telegram')">
+        <div class="share-icon" style="background:#E3F2FD">✈️</div>
+        <span>Telegram</span>
+      </div>
+      <div class="share-item" onclick="doShare('instagram')">
+        <div class="share-icon" style="background:#FCE4EC">📸</div>
+        <span>Instagram</span>
+      </div>
+      <div class="share-item" onclick="doShare('tiktok')">
+        <div class="share-icon" style="background:#F3E5F5">🎵</div>
+        <span>TikTok</span>
+      </div>
+      <div class="share-item" onclick="doShare('copy')">
+        <div class="share-icon" style="background:#F5F5F5">🔗</div>
+        <span>Copy link</span>
+      </div>
+    </div>
+    <button class="share-cancel" onclick="closeShare()">Cancel</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+  <div class="hero">
+    <h1>Haraka Loans</h1>
+    <p>Fast, simple loans for Kenyans. Apply in minutes.</p>
+  </div>
+  <div class="body">
+    <div class="card">
+      <div class="section-title" style="margin-bottom:3px">Sign in</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:16px">Use your Kenyan phone number &amp; National ID</p>
+      <div id="login-error" class="error">Invalid phone number or National ID. Please try again.</div>
+      <div class="field">
+        <label>Phone number</label>
+        <input id="login-phone" type="tel" placeholder="e.g. 0712345678" maxlength="10"/>
+        <div class="hint">Valid Kenyan number (07xx or 01xx)</div>
+      </div>
+      <div class="field">
+        <label>National ID number</label>
+        <input id="login-id" type="password" placeholder="Enter your National ID"/>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign in</button>
+      <button class="btn btn-outline" onclick="show('s-register')">Create account</button>
+    </div>
+    <div style="text-align:center;margin-top:4px">
+      <span style="font-size:12px;color:var(--text3);cursor:pointer" onclick="show('s-contact')">Contact us</span>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="s-register" class="screen">
+  <div class="topbar">
+    <span class="topbar-back" onclick="show('s-login')">&#8592;</span>
+    <div><div class="topbar-logo">Haraka Loans</div><div class="topbar-subtitle">Create account</div></div>
+  </div>
+  <div class="body">
+    <div class="card">
+      <div id="reg-error" class="error"></div>
+      <div class="field"><label>Full name</label><input id="reg-name" type="text" placeholder="e.g. Jane Wanjiku"/></div>
+      <div class="field">
+        <label>Phone number (username)</label>
+        <input id="reg-phone" type="tel" placeholder="e.g. 0712345678" maxlength="10"/>
+        <div class="hint">Valid Kenyan number (07xx or 01xx)</div>
+      </div>
+      <div class="field"><label>National ID number (password)</label><input id="reg-id" type="text" placeholder="Enter your National ID"/></div>
+      <div class="field"><label>Confirm National ID</label><input id="reg-id2" type="password" placeholder="Re-enter National ID"/></div>
+      <div class="tc-check">
+        <input type="checkbox" id="tc-box"/>
+        <span>I have read and agree to the <span class="tc-link" onclick="show('s-terms')">Terms &amp; Conditions</span> of Haraka Loans.</span>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Create account</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="s-dashboard" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-logo">Haraka Loans</div><div class="topbar-subtitle" id="dash-sub">Welcome back</div></div>
+    <div class="topbar-right">
+      <button class="btn-icon" onclick="openNotice()">&#9432; Notice</button>
+      <button class="btn-icon" onclick="show('s-contact')">Contact</button>
+      <button class="btn-icon" onclick="doLogout()">Out</button>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('tab-loans','tab-history',this)">Apply</div>
+    <div class="nav-tab" onclick="switchTab('tab-history','tab-loans',this)">My loans</div>
+    <div class="nav-tab" onclick="switchTab('tab-referral','tab-loans',this);switchTab('tab-referral','tab-history',this)">Referral</div>
+  </div>
+
+  <!-- Apply tab -->
+  <div id="tab-loans" class="body">
+    <div id="free-loan-banner" class="free-loan-banner">
+      <div class="free-loan-banner-title">🎉 You have a FREE loan!</div>
+      <div class="free-loan-banner-sub">Your next loan is free — no service fee. Valid for 48 hrs after your last application.</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-val" id="stat-avail">KSh 0</div><div class="stat-label">Available</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-label">Loans taken</div></div>
+    </div>
+    <div class="section-title">Select loan amount</div>
+    <div class="loan-grid" id="loan-grid"></div>
+    <div id="loan-summary" class="card" style="display:none">
+      <div class="badge badge-green">&#10003; Selected</div>
+      <div class="summary-row"><span class="k">Loan amount</span><span class="v green" id="sum-amount">-</span></div>
+      <div class="summary-row"><span class="k">Service fee (5%)</span><span class="v amber" id="sum-fee">-</span></div>
+      <div class="summary-row"><span class="k">You receive</span><span class="v" id="sum-receive">-</span></div>
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:13px">Follow payment instructions on the next screen to pay your service fee via M-Pesa.</p>
+      <button class="btn btn-primary" onclick="goToPayment()">Proceed to pay fee</button>
+    </div>
+  </div>
+
+  <!-- History tab -->
+  <div id="tab-history" class="body" style="display:none">
+    <div id="history-list"></div>
+  </div>
+
+  <!-- Referral tab -->
+  <div id="tab-referral" class="body" style="display:none">
+    <div class="ref-prog-card">
+      <div class="ref-prog-title">🎁 Referral Programme</div>
+      <div class="ref-prog-sub">Refer <strong>10 friends</strong> to Haraka Loans and get your <strong>next loan for FREE</strong> — no service fee! Share one friend at a time. After 10 successful referrals, enjoy 48 hrs to apply for a free loan.</div>
+      <div class="ref-bar-wrap"><div class="ref-bar-fill" id="ref-bar-fill" style="width:0%"></div></div>
+      <div class="ref-bar-label"><span id="ref-count-label">0 of 10 referred</span><span id="ref-pct-label">0%</span></div>
+      <div class="ref-dots" id="ref-dots"></div>
+      <div id="ref-complete-badge" class="ref-complete-badge">
+        <div class="ref-complete-title">🎉 Referral Complete!</div>
+        <div class="ref-complete-sub">You've referred 10 friends! Your next loan within 48 hrs of your last application is <strong>FREE</strong> — no service fee.</div>
+      </div>
+      <button class="ref-share-btn" id="ref-share-btn" onclick="openShare()">📤 Share with a friend (+1 referral)</button>
+    </div>
+    <div class="card" style="background:var(--bg)">
+      <p style="font-size:12px;color:var(--text2);line-height:1.7"><strong>How it works:</strong><br>1. Tap "Share with a friend" above.<br>2. Choose your platform and share the link with one person.<br>3. Each share counts as one referral toward your 10.<br>4. Once you hit 10, your next loan within 48 hrs of application is FREE.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT INSTRUCTIONS -->
+<div id="s-payment" class="screen">
+  <div class="topbar">
+    <span class="topbar-back" onclick="show('s-dashboard')">&#8592;</span>
+    <div><div class="topbar-logo">Haraka Loans</div><div class="topbar-subtitle">Service fee payment</div></div>
+  </div>
+  <div class="body">
+    <div class="pay-fee-highlight">
+      <div class="pay-fee-row"><span style="font-size:13px;color:var(--text2)">Loan amount</span><span style="font-size:13px;font-weight:700;color:var(--green-dark)" id="pay-loan-disp">-</span></div>
+      <div style="height:.5px;background:var(--border);margin:4px 0"></div>
+      <div class="pay-fee-row"><span style="font-size:13px;color:var(--text2)">Service fee to pay</span><span style="font-size:16px;font-weight:800;color:var(--amber)" id="pay-fee-disp">-</span></div>
+    </div>
+
+    <div class="pay-instr-box">
+      <div class="pay-instr-title">📋 How to pay your service fee</div>
+      <div class="pay-step">
+        <div class="pay-step-num">1</div>
+        <div class="pay-step-text">Note your service fee shown above — e.g. <strong>KSh 50</strong> for a KSh 1,000 loan.</div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">2</div>
+        <div class="pay-step-text">Open the payment link: <a href="https://lipwa.link/8655" target="_blank" class="pay-link">https://lipwa.link/8655</a></div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">3</div>
+        <div class="pay-step-text">Enter your <strong>M-Pesa number</strong> in the phone number box, your <strong>name</strong> in the customer name field, and the <strong>exact service fee</strong> amount for your loan.</div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">4</div>
+        <div class="pay-step-text">Tap the <strong>circular refresh button</strong> next to the Reference field to generate a reference.</div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">5</div>
+        <div class="pay-step-text">Click <strong>"Pay via M-Pesa"</strong> and complete the payment on your phone.</div>
+      </div>
+    </div>
+
+    <div class="pay-warning">
+      ⚠️ <strong>Important:</strong> Entering the wrong service fee amount will result in no loan disbursement. Please double-check the amount before paying.
+    </div>
+
+    <a href="https://lipwa.link/8655" target="_blank" style="text-decoration:none;display:block;margin-bottom:12px">
+      <button class="btn btn-primary" style="background:var(--green-dark)">🔗 Open Payment Link</button>
+    </a>
+    <button class="pay-done-btn" onclick="completeLoan()">✅ I have paid — Confirm</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="s-success" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-logo">Haraka Loans</div></div>
+  </div>
+  <div class="body" style="display:flex;flex-direction:column;align-items:center;padding-top:36px">
+    <div class="success-icon">&#10003;</div>
+    <div class="success-title">Application Submitted!</div>
+    <div class="success-sub">Your payment has been noted. Your loan will be disbursed to your M-Pesa number within 24 hours, normally within 1 hour.</div>
+    <div class="ref-box" style="width:100%">
+      <div class="ref-label">TRANSACTION REF</div>
+      <div class="ref-num" id="ref-num">HRK-000000</div>
+    </div>
+    <div class="card" style="width:100%">
+      <div class="summary-row"><span class="k">Amount applied</span><span class="v green" id="suc-amount">-</span></div>
+      <div class="summary-row"><span class="k">Fee paid</span><span class="v" id="suc-fee">-</span></div>
+      <div class="summary-row"><span class="k">M-Pesa number</span><span class="v" id="suc-phone">-</span></div>
+      <div class="summary-row"><span class="k">Date</span><span class="v" id="suc-date">-</span></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="show('s-dashboard');refreshDash()">Back to dashboard</button>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div id="s-contact" class="screen">
+  <div class="topbar">
+    <span class="topbar-back" onclick="goBack()">&#8592;</span>
+    <div><div class="topbar-logo">Haraka Loans</div><div class="topbar-subtitle">Contact us</div></div>
+  </div>
+  <div class="body">
+    <div class="card">
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px">We're here to help. For loan delays, contact us immediately with your reference number.</p>
+      <div class="contact-row"><div class="contact-icon-box">&#128222;</div><div><div class="contact-label">Phone / WhatsApp</div><div class="contact-val">+254 770 570 283</div></div></div>
+      <div class="contact-row"><div class="contact-icon-box">&#9993;</div><div><div class="contact-label">Email</div><div class="contact-val">harakaloans@proton.me</div></div></div>
+      <div class="contact-row"><div class="contact-icon-box">&#128337;</div><div><div class="contact-label">Support hours</div><div class="contact-val">Mon – Sat, 8am – 8pm</div></div></div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text)">Loan delay?</p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.6">Loans are normally processed within 1 hour. If yours has taken longer than 24 hours, please contact us immediately.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TERMS -->
+<div id="s-terms" class="screen">
+  <div class="topbar">
+    <span class="topbar-back" onclick="show('s-register')">&#8592;</span>
+    <div><div class="topbar-logo">Haraka Loans</div><div class="topbar-subtitle">Terms &amp; Conditions</div></div>
+  </div>
+  <div class="tc-page">
+    <h2>1. Introduction</h2>
+    <p>These Terms govern the lending relationship between Haraka Loans ("Lender") and the individual borrower ("Borrower"). By creating an account you agree to be bound by this Agreement, governed by the laws of Kenya, including the Microfinance Act, the Central Bank of Kenya Act, and the Data Protection Act 2019.</p>
+    <h2>2. Eligibility</h2>
+    <ul>
+      <li>Kenyan citizen aged 18 years or older.</li>
+      <li>Valid Kenyan National Identity Card.</li>
+      <li>Active Safaricom M-Pesa registered mobile number.</li>
+      <li>Truthful and accurate information during registration.</li>
+    </ul>
+    <h2>3. Loan Products</h2>
+    <p>Unsecured mobile loans from <strong>KSh 1,000 to KSh 20,000</strong> in KSh 1,000 increments, subject to credit assessment.</p>
+    <h2>4. Service Fee</h2>
+    <p>A non-refundable <strong>5% service fee</strong> is charged at application and collected via the payment link before disbursement.</p>
+    <h2>5. Interest Rate &amp; Repayment</h2>
+    <p><strong>6% monthly interest</strong> on outstanding principal, repayable within <strong>6 months</strong>. No early repayment penalty. Late repayment may result in CRB listing.</p>
+    <h2>6. Disbursement</h2>
+    <p>Funds disbursed to M-Pesa within <strong>24 hours</strong>, normally within 1 hour. Contact us for delays beyond 24 hours.</p>
+    <h2>7. Referral Programme</h2>
+    <p>Users who refer 10 friends are eligible for a free loan (no service fee) applied within 48 hours of their last application. Referrals are tracked by shares made through the in-app referral feature. Haraka Loans reserves the right to verify referrals and withdraw the benefit in case of abuse.</p>
+    <h2>8. Default &amp; Collections</h2>
+    <ul>
+      <li>Late fees up to 5% of outstanding balance per month.</li>
+      <li>Reporting to licensed Credit Reference Bureaus in Kenya.</li>
+      <li>Legal remedies under Kenyan law.</li>
+    </ul>
+    <h2>9. Data Privacy</h2>
+    <p>Personal data handled per <strong>Kenya Data Protection Act 2019</strong>. Not sold to third parties. Contact harakaloans@proton.me to request data access or deletion.</p>
+    <h2>10. Amendments</h2>
+    <p>Haraka Loans may amend these terms at any time with notice via your registered phone or email.</p>
+    <h2>11. Dispute Resolution</h2>
+    <p>Disputes resolved amicably first; if unresolved within 30 days, referred to arbitration in Nairobi under the Arbitration Act (Cap 49).</p>
+    <h2>12. Contact</h2>
+    <p><strong>+254 770 570 283</strong> &nbsp;|&nbsp; <strong>harakaloans@proton.me</strong></p>
+    <div style="margin-top:20px;margin-bottom:30px">
+      <button class="btn btn-primary" onclick="show('s-register');document.getElementById('tc-box').checked=true">I Agree &amp; Go Back</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+const LOANS=[1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000];
+const APP_URL=window.location.href;
+const SHARE_MSG="Get instant mobile loans of KSh 1,000–20,000 via M-Pesa with Haraka Loans! Fast, simple, no paperwork. Apply here: "+APP_URL;
+
+let state={user:null,selectedLoan:0,loanHistory:[],prevScreen:'s-login'};
+
+function show(id){
+  const cur=document.querySelector('.screen.active');
+  if(cur)state.prevScreen=cur.id;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goBack(){show(state.prevScreen||'s-login');}
+function fmt(n){return'KSh '+n.toLocaleString();}
+function validPhone(p){return/^0[17]\d{8}$/.test(p);}
+function validID(id){return id.length>=6&&id.length<=10&&/^\d+$/.test(id);}
+
+/* ── NOTICE ── */
+function openNotice(){document.getElementById('notice-modal').classList.add('open');}
+function closeNotice(){document.getElementById('notice-modal').classList.remove('open');}
+function closeNoticeIfBg(e){if(e.target===document.getElementById('notice-modal'))closeNotice();}
+
+/* ── SHARE ── */
+function openShare(){document.getElementById('share-modal').classList.add('open');}
+function closeShare(){document.getElementById('share-modal').classList.remove('open');}
+function closeShareIfBg(e){if(e.target===document.getElementById('share-modal'))closeShare();}
+
+function doShare(platform){
+  const msg=encodeURIComponent(SHARE_MSG);
+  const url=encodeURIComponent(APP_URL);
+  let link='';
+  if(platform==='whatsapp') link='https://wa.me/?text='+msg;
+  else if(platform==='facebook') link='https://www.facebook.com/sharer/sharer.php?u='+url+'&quote='+msg;
+  else if(platform==='sms') link='sms:?body='+msg;
+  else if(platform==='twitter') link='https://twitter.com/intent/tweet?text='+msg;
+  else if(platform==='telegram') link='https://t.me/share/url?url='+url+'&text='+msg;
+  else if(platform==='instagram'||platform==='tiktok'){
+    navigator.clipboard&&navigator.clipboard.writeText(SHARE_MSG);
+    alert('Link copied! Paste it into your '+( platform==='instagram'?'Instagram':'TikTok')+' bio or story.');
+    recordReferral();closeShare();return;
+  } else if(platform==='copy'){
+    navigator.clipboard&&navigator.clipboard.writeText(SHARE_MSG);
+    alert('Link copied to clipboard! Share it with a friend.');
+    recordReferral();closeShare();return;
+  }
+  if(link){window.open(link,'_blank');}
+  recordReferral();
+  closeShare();
+}
+
+function recordReferral(){
+  if(!state.user)return;
+  const phone=state.user.phone;
+  let refs=0;
+  try{refs=parseInt(localStorage.getItem('hk_refs_'+phone)||'0');}catch(e){}
+  if(refs>=10){alert('You have already completed your 10 referrals! 🎉');return;}
+  refs++;
+  try{localStorage.setItem('hk_refs_'+phone,refs);}catch(e){}
+  updateReferralUI(refs);
+  if(refs===10){
+    setTimeout(()=>{
+      alert('🎉 Congratulations! You have referred 10 friends!\n\nYour NEXT loan within 48 hours of your last application is completely FREE — no service fee!');
+    },300);
+  } else {
+    alert('Referral recorded! '+refs+'/10 friends referred. '+(10-refs)+' more to go!');
+  }
+}
+
+function getReferrals(){
+  if(!state.user)return 0;
+  try{return parseInt(localStorage.getItem('hk_refs_'+state.user.phone)||'0');}catch(e){return 0;}
+}
+
+function updateReferralUI(refs){
+  const pct=Math.min(refs/10*100,100);
+  const fill=document.getElementById('ref-bar-fill');
+  const countLbl=document.getElementById('ref-count-label');
+  const pctLbl=document.getElementById('ref-pct-label');
+  const badge=document.getElementById('ref-complete-badge');
+  const shareBtn=document.getElementById('ref-share-btn');
+  const dots=document.getElementById('ref-dots');
+  if(fill)fill.style.width=pct+'%';
+  if(countLbl)countLbl.textContent=refs+' of 10 referred';
+  if(pctLbl)pctLbl.textContent=pct+'%';
+  if(dots){
+    dots.innerHTML='';
+    for(let i=1;i<=10;i++){
+      const d=document.createElement('div');
+      d.className='ref-dot'+(i<=refs?' done':'');
+      d.textContent=i<=refs?'✓':i;
+      dots.appendChild(d);
+    }
+  }
+  if(refs>=10){
+    if(badge)badge.classList.add('show');
+    if(shareBtn)shareBtn.style.display='none';
+  } else {
+    if(badge)badge.classList.remove('show');
+    if(shareBtn)shareBtn.style.display='block';
+  }
+}
+
+/* ── FREE LOAN CHECK ── */
+function checkFreeLoan(){
+  if(!state.user||!state.loanHistory.length)return false;
+  const refs=getReferrals();
+  if(refs<10)return false;
+  const last=state.loanHistory[0];
+  const lastDate=new Date(last.timestamp||Date.now());
+  const now=new Date();
+  const diffHrs=(now-lastDate)/3600000;
+  return diffHrs<=48;
+}
+
+/* ── AUTH ── */
+function doLogin(){
+  const phone=document.getElementById('login-phone').value.trim();
+  const nid=document.getElementById('login-id').value.trim();
+  const err=document.getElementById('login-error');
+  let users={};
+  try{users=JSON.parse(localStorage.getItem('hk_users')||'{}');}catch(e){}
+  if(!validPhone(phone)||!validID(nid)||!users[phone]||users[phone].nid!==nid){
+    err.style.display='block';return;
+  }
+  err.style.display='none';
+  state.user={phone,name:users[phone].name};
+  try{state.loanHistory=JSON.parse(localStorage.getItem('hk_loans_'+phone)||'[]');}catch(e){state.loanHistory=[];}
+  buildLoanGrid();refreshDash();show('s-dashboard');
+}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const phone=document.getElementById('reg-phone').value.trim();
+  const nid=document.getElementById('reg-id').value.trim();
+  const nid2=document.getElementById('reg-id2').value.trim();
+  const tc=document.getElementById('tc-box').checked;
+  const err=document.getElementById('reg-error');
+  if(!name){err.textContent='Please enter your full name.';err.style.display='block';return;}
+  if(!validPhone(phone)){err.textContent='Enter a valid Kenyan phone number (07xx or 01xx, 10 digits).';err.style.display='block';return;}
+  if(!validID(nid)){err.textContent='National ID must be 6–10 digits.';err.style.display='block';return;}
+  if(nid!==nid2){err.textContent='National ID numbers do not match.';err.style.display='block';return;}
+  if(!tc){err.textContent='Please agree to the Terms & Conditions to continue.';err.style.display='block';return;}
+  let users={};
+  try{users=JSON.parse(localStorage.getItem('hk_users')||'{}');}catch(e){}
+  if(users[phone]){err.textContent='This phone number is already registered.';err.style.display='block';return;}
+  users[phone]={name,nid};
+  try{localStorage.setItem('hk_users',JSON.stringify(users));}catch(e){}
+  err.style.display='none';
+  alert('Account created! You can now sign in.');
+  show('s-login');
+}
+
+function doLogout(){state.user=null;state.selectedLoan=0;show('s-login');}
+
+/* ── LOANS ── */
+function buildLoanGrid(){
+  const g=document.getElementById('loan-grid');g.innerHTML='';
+  LOANS.forEach(amt=>{
+    const d=document.createElement('div');
+    d.className='loan-card';d.dataset.amt=amt;
+    d.innerHTML='<div class="amount">'+fmt(amt)+'</div><div class="label">Fee: '+fmt(amt*0.05)+'</div>';
+    d.onclick=()=>selectLoan(amt,d);
+    g.appendChild(d);
+  });
+}
+
+function selectLoan(amt,el){
+  document.querySelectorAll('.loan-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');state.selectedLoan=amt;
+  const fee=checkFreeLoan()?0:amt*0.05;
+  document.getElementById('sum-amount').textContent=fmt(amt);
+  document.getElementById('sum-fee').textContent=fee===0?'FREE 🎉':fmt(fee);
+  document.getElementById('sum-receive').textContent=fmt(amt);
+  document.getElementById('loan-summary').style.display='block';
+}
+
+function goToPayment(){
+  if(!state.selectedLoan)return;
+  const isFree=checkFreeLoan();
+  const fee=isFree?0:state.selectedLoan*0.05;
+  document.getElementById('pay-loan-disp').textContent=fmt(state.selectedLoan);
+  document.getElementById('pay-fee-disp').textContent=isFree?'FREE 🎉':fmt(fee);
+  if(isFree){
+    // Skip payment, go straight to confirm
+    if(confirm('Your loan is FREE! No service fee needed.\n\nTap OK to confirm your loan application.')){
+      completeLoan();
+    }
+    return;
+  }
+  show('s-payment');
+}
+
+function completeLoan(){
+  const amt=state.selectedLoan;
+  const isFree=checkFreeLoan();
+  const fee=isFree?0:amt*0.05;
+  const ref='HRK-'+Math.floor(100000+Math.random()*900000);
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-KE',{day:'2-digit',month:'short',year:'numeric'});
+  const phone=state.user.phone;
+  const display=phone.replace(/^0/,'+254 ').replace(/(\d{3})(\d{3})(\d{3})/,'$1 $2 $3');
+  document.getElementById('ref-num').textContent=ref;
+  document.getElementById('suc-amount').textContent=fmt(amt);
+  document.getElementById('suc-fee').textContent=isFree?'FREE':fmt(fee);
+  document.getElementById('suc-phone').textContent=display;
+  document.getElementById('suc-date').textContent=dateStr;
+  const entry={ref,amt,fee,date:dateStr,timestamp:now.toISOString()};
+  state.loanHistory.unshift(entry);
+  try{localStorage.setItem('hk_loans_'+phone,JSON.stringify(state.loanHistory));}catch(e){}
+  state.selectedLoan=0;
+  document.querySelectorAll('.loan-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('loan-summary').style.display='none';
+  show('s-success');
+}
+
+function refreshDash(){
+  document.getElementById('dash-sub').textContent='Welcome, '+state.user.name.split(' ')[0];
+  const total=state.loanHistory.reduce((s,l)=>s+l.amt,0);
+  document.getElementById('stat-avail').textContent=fmt(Math.max(0,20000-total));
+  document.getElementById('stat-total').textContent=state.loanHistory.length;
+  const banner=document.getElementById('free-loan-banner');
+  if(banner)banner.classList.toggle('show',checkFreeLoan());
+  updateReferralUI(getReferrals());
+  renderHistory();
+}
+
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!state.loanHistory.length){el.innerHTML='<div class="empty-state">No loans yet. Apply for your first loan!</div>';return;}
+  el.innerHTML='<div class="section-title">Loan history</div>'+state.loanHistory.map(l=>`
+    <div class="card" style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <span style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--green-dark)">${fmt(l.amt)}</span>
+        <span class="pill pill-success">Processing</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">Ref: ${l.ref} &nbsp;|&nbsp; ${l.date}</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:3px">Fee paid: ${l.fee===0?'FREE':fmt(l.fee)}</div>
+    </div>`).join('');
+}
+
+function switchTab(show_id,hide_id,el){
+  ['tab-loans','tab-history','tab-referral'].forEach(id=>{
+    const t=document.getElementById(id);
+    if(t)t.style.display=id===show_id?'block':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(show_id==='tab-referral')updateReferralUI(getReferrals());
+  if(show_id==='tab-history')renderHistory();
+}
+</script>
+</body>
+</html>
